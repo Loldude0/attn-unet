@@ -29,8 +29,8 @@ test = NYUv2(
     target_transform=target_transform,
 )
 
-train_loader = DataLoader(train, batch_size=4, shuffle=True)
-test_loader = DataLoader(test, batch_size=4, shuffle=False)
+train_loader = DataLoader(train, batch_size=8, shuffle=True)
+test_loader = DataLoader(test, batch_size=8, shuffle=False)
 model = UNet(3, 1).to("cuda")
 crit = nn.MSELoss()
 opt = optim.Adam(model.parameters(), lr=1e-4)
