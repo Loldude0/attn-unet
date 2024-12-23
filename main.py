@@ -10,8 +10,11 @@ import sys
 sys.path.append("nyuv2-python-toolkit")
 from nyuv2 import NYUv2
 
-transform = transforms.Compose([transforms.ToTensor()])
-target_transform = transforms.Compose([transforms.ToTensor()])
+transform = transforms.Compose([transforms.ToTensor(),
+transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])])
+
+target_transform = transforms.Compose([transforms.ToTensor(),
+transforms.Lambda(lambda x: x /x.max())])
 
 train = NYUv2(
     root="C:/Projects/attn-unet/data/depth_output",
@@ -29,11 +32,12 @@ test = NYUv2(
     target_transform=target_transform,
 )
 
-train_loader = DataLoader(train, batch_size=8, shuffle=True)
-test_loader = DataLoader(test, batch_size=8, shuffle=False)
+train_loader = DataLoader(train, batch_size=4, shuffle=True)
+test_loader = DataLoader(test, batch_size=4, shuffle=False)
 model = UNet(3, 1).to("cuda")
-crit = nn.MSELoss()
+crit = nn.L1Loss()
 opt = optim.Adam(model.parameters(), lr=1e-4)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(opt, "min", patience=5, factor=0.5)
 
 epochs = 50
 for epoch in range(epochs):
@@ -66,5 +70,6 @@ for epoch in range(epochs):
 
     val_loss = running_loss / len(test_loader.dataset)
     print(f"Validation loss: {val_loss}")
+    scheduler.step(val_loss)
 
 torch.save(model.state_dict(), "model.pth")
