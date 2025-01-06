@@ -23,8 +23,10 @@ class Encoder(nn.Module):
         super(Encoder, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(in_c, out_c, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(out_c),
             nn.ReLU(inplace=True),
             nn.Conv2d(out_c, out_c, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(out_c),
             nn.ReLU(inplace=True)
         )
 
@@ -37,8 +39,10 @@ class Decoder(nn.Module):
         self.up = nn.ConvTranspose2d(in_c, out_c, kernel_size=2, stride=2)
         self.conv = nn.Sequential(
             nn.Conv2d(in_c, out_c, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(out_c),
             nn.ReLU(inplace=True),
             nn.Conv2d(out_c, out_c, kernel_size=3, stride=1, padding=1),
+            nn.BatchNorm2d(out_c),
             nn.ReLU(inplace=True)
         )
 
